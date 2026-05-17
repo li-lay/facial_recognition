@@ -13,6 +13,3 @@ dependencies = [
     "face-recognition-models",
     "setuptools<71.0",
 ]
-
-[tool.uv.sources]
-face-recognition-models = { git = "https://github.com/ageitgey/face_recognition_models" }

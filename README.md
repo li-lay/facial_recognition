@@ -7,7 +7,7 @@ Real-time facial recognition and emotion detection using a webcam feed. The appl
 - **Face Recognition** — Identify known faces from reference photos with configurable tolerance
 - **Emotion Detection** — Detect dominant emotions (happy, sad, angry, etc.) using DeepFace
 - **Real-time Processing** — Live webcam feed with bounding boxes and labels
-- **Performance Optimized** — Frames are downscaled for faster detection; emotions are computed every 5 frames to reduce overhead
+- **Performance Optimized** — Frames are downscaled for faster detection; emotions are computed every 5 frames; face crops are resized before analysis
 
 ## Requirements
 
@@ -49,18 +49,29 @@ uv run main.py
 
 ## Configuration
 
-| Setting | File | Default | Description |
-|---|---|---|---|
-| `EMOTION_EVERY_N_FRAMES` | `main.py:8` | `5` | How often (in frames) to run emotion detection. Higher values improve performance |
-| `tolerance` | `face_recognizer.py:37` | `0.6` | Face matching tolerance. Lower = stricter matching |
+All settings are centralized in `config.py`.
+
+| Setting | Default | Description |
+|---|---|---|
+| `SCALE_FACTOR` | `0.25` | Downscale ratio for face detection. Lower = faster but less accurate on small faces |
+| `TOLERANCE` | `0.6` | Face matching tolerance. Lower = stricter matching |
+| `EMOTION_EVERY_N_FRAMES` | `5` | How often (in frames) to run emotion detection. Higher values improve FPS |
+| `EMOTION_INPUT_SIZE` | `224` | Resize face crop to this size before emotion analysis. Smaller = faster |
+| `CAMERA_INDEX` | `0` | Webcam device index |
+| `WINDOW_NAME` | `"Facial Recognition + Emotion Detection"` | Display window title |
+| `KNOWN_FACES_DIR` | `"known_faces"` | Directory containing reference photos |
+| `LOG_LEVEL` | `INFO` | Logging verbosity (`DEBUG`, `INFO`, `WARNING`, `ERROR`) |
 
 ## Project Structure
 
 ```
 .
-├── main.py               # Entry point — webcam loop, drawing, orchestration
-├── face_recognizer.py    # FaceRecognizer class — loads and matches known faces
-├── emotion_detector.py   # EmotionDetector class — DeepFace emotion analysis
+├── main.py               # Entry point — webcam loop, setup, logging
+├── config.py             # Centralized settings (all tunable parameters)
+├── pipeline.py           # ProcessingWorker — threaded frame pipeline + PipelineResult
+├── drawing.py            # draw_results — bounding boxes and labels overlay
+├── face_recognizer.py    # FaceRecognizer — loads and matches known faces
+├── emotion_detector.py   # EmotionDetector — DeepFace emotion analysis with caching
 ├── known_faces/          # Reference photos for face recognition
 └── pyproject.toml        # Project metadata and dependencies
 ```

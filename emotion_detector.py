@@ -1,5 +1,9 @@
+import logging
+
 import numpy as np
 from deepface import DeepFace
+
+logger = logging.getLogger(__name__)
 
 
 class EmotionDetector:
@@ -21,7 +25,8 @@ class EmotionDetector:
             if emotion and name != "Unknown":
                 self.last_emotions[name] = emotion
             return emotion
-        except Exception:
+        except Exception as exc:
+            logger.debug("Emotion analysis failed for %s: %s", name, exc)
             return None
 
     def get_cached_emotion(self, name: str) -> str | None:
